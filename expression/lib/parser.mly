@@ -4,12 +4,14 @@
 %token <string> IDENT
 %token LPAREN
 %token RPAREN
+%token EQUAL
 %token EOF
 %start main
 %type <expression list> main
 %%
 main:
 | e = expression ; EOF { [e] }
+
 expression:
 | LPAREN ; e = expression ; RPAREN { e }
 | nm = IDENT { Identifier nm }
@@ -17,3 +19,7 @@ expression:
   { Application (e1, Identifier nm) }
 | e1 = expression; LPAREN; e2 = expression; RPAREN
   { Application (e1, e2) }
+
+equal:
+| e1 = expression; EQUAL; e2 = expression 
+  { Equality (e1, e2) }
