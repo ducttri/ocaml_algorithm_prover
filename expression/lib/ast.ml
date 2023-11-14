@@ -1,9 +1,10 @@
 type expression =
   | Identifier of string
-  | Application of expression * expression
+  | Application of expression * expression list 
 
-and var =
-  | Variable of (string * string) list
+and pattern =
+  | Constructor of string * pattern list
+  | Variable of string * string
 
 and equal = 
   | Equality of expression * expression
@@ -14,4 +15,4 @@ and hint =
   | Direct  
 
 and decl = 
-  | Proof of (string * var list * equal * hint option)
+  | Proof of (string * pattern list * equal * hint option)
