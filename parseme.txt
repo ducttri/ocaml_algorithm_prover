@@ -1,1 +1,3 @@
-cf (cf h)
+let (*prove*) inv_involution (h : int)
+= (inv (inv h) = h)
+(*hintaxiom*)
