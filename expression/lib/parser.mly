@@ -8,6 +8,7 @@
 %token COLON
 %token LET
 %token EOF
+%token PROVE
 %token <string> HINT
 %start main
 %type <declaration list> main
@@ -16,16 +17,21 @@
 %type <pattern> pattern
 %type <equal> equal
 %type <hint> hint
+%type <typeVar> typeVar
 %%
 main:
 | d = declaration ; EOF { [d] }
 
 declaration:
-| LET ; nm = IDENT; pt = pattern; EQUALS; eq1 = equal; hint = hint
-  { Proof (nm, pt, eq1, hint) }
+| LET ; PROVE ; nm = IDENT; var = typeVar; EQUALS; eq1 = equal; hint = hint
+  { Proof (nm, var, eq1, hint) }
 
 hint:
 | { Axiom }
+
+typeVar:
+| LPAREN ; nm1 = IDENT ; COLON ; nm2 = IDENT ; RPAREN  { Var (nm1, nm2) }
+
 
 pattern:
 | LPAREN ; nm1 = IDENT ; COLON ; nm2 = IDENT ; RPAREN  { Variable (nm1, nm2) }

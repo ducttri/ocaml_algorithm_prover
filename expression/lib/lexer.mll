@@ -8,7 +8,8 @@ let newline = '\r' | '\n' | "\r\n"
 rule token = parse
  | [' ' '\t'] { token lexbuf }
  | newline { Lexing.new_line lexbuf; token lexbuf }
- | "let (*prove*)" { LET }
+ | "let" { LET }
+ | "(*prove*)" { PROVE }
  | "(*hint: " { hint lexbuf }
  | "(*" { comment 0 lexbuf }
  | ":" { COLON }
