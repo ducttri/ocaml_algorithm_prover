@@ -1,18 +1,19 @@
 type expression =
+  | Application of expression * expression 
   | Identifier of string
-  | Application of expression * expression list 
 
-and pattern =
+
+type pattern =
   | Constructor of string * pattern list
   | Variable of string * string
 
-and equal = 
+type equal = 
   | Equality of expression * expression
 
-and hint = 
-  | Axiom
-  | Induction
-  | Direct  
+type hint = 
+  | Axiom 
 
-and decl = 
-  | Proof of (string * pattern list * equal * hint option)
+type declaration = 
+  | Proof of (string * pattern * equal * hint)
+
+  (* Proof of (string * pattern list * equal * hint option) *)

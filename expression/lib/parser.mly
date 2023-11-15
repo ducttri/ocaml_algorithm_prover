@@ -4,13 +4,32 @@
 %token <string> IDENT
 %token LPAREN
 %token RPAREN
-%token EQUAL
+%token EQUALS
+%token COLON
+%token LET
 %token EOF
+%token <string> HINT
 %start main
-%type <expression list> main
+%type <declaration list> main
+%type <declaration> declaration
+%type <expression> expression
+%type <pattern> pattern
+%type <equal> equal
+%type <hint> hint
 %%
 main:
-| e = expression ; EOF { [e] }
+| d = declaration ; EOF { [d] }
+
+declaration:
+| LET ; nm = IDENT; pt = pattern; EQUALS; eq1 = equal; hint = hint
+  { Proof (nm, pt, eq1, hint) }
+
+hint:
+| { Axiom }
+
+pattern:
+| LPAREN ; nm1 = IDENT ; COLON ; nm2 = IDENT ; RPAREN  { Variable (nm1, nm2) }
+| nm1 = IDENT ; p1 = list(pattern) { Constructor (nm1, p1) }
 
 expression:
 | LPAREN ; e = expression ; RPAREN { e }
@@ -21,5 +40,5 @@ expression:
   { Application (e1, e2) }
 
 equal:
-| e1 = expression; EQUAL; e2 = expression 
+| LPAREN ; e1 = expression; EQUALS ; e2 = expression ; RPAREN 
   { Equality (e1, e2) }
