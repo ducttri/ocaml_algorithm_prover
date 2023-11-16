@@ -1,11 +1,11 @@
 type expression =
-  (* | Application of expression * expression  *)
-  | Application of (expression * expression)
+  | Application of (expression * expression list)
   | Identifier of string
 
+(*pattern type in ast*)
 type pattern =
   | Constructor of (string * pattern list)
-  | Type of (string * string)
+  | Variable of string * string
   (* constructor are like match .... with | a; | b *)
   (* variable are inside when matching for ex Cons(h, append ...) *) 
 type typeVar =
@@ -17,7 +17,7 @@ type equal =
 
 type hint =
   | Axiom 
-  (* | Induction of string *)
+  | Induction of string
 
 type declaration = 
   | Proof of (string * typeVar list * equal * hint option)
