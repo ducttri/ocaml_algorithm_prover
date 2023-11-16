@@ -10,13 +10,17 @@ rule token = parse
  | newline { Lexing.new_line lexbuf; token lexbuf }
  | "let" { LET }
  (* | "type" { TYPE } *)
+ | "rec" { REC }
+ | "with" { WITH }
+ | "match" { MATCH }
  | "(*prove*)" { PROVE }
  | "(*hint: axiom *)" { AXIOM }
  | "(*hint: induction" { induction lexbuf}
  | "(*" { comment 0 lexbuf }
  (* | "of" { OF } *)
- (* | "|" { PATTERN } *)
- (* | "->" { MATCH } *)
+ | "|" { PATTERN }
+ | "*" { PAIR }
+ | "->" { ARROW }
  | "," { COMMA }
  | ":" { COLON }
  | "(" { LPAREN }

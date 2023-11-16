@@ -4,7 +4,11 @@ module Lexer = Lexer
 
 let rec string_of_declaration (d : declaration) : string
  = match d with
- | Proof (name, variable, equal, hint) -> "let (*prove*) " ^ name ^ " " ^ string_of_variable_list variable ^ " = (" ^ (string_of_equal equal) ^ ") \n" ^ (string_of_hint hint)
+ | Proof (name, variables, equal, hint) -> "let (*prove*) " ^ name ^ "" ^ string_of_pattern_list variables ^ " = (" ^ (string_of_equal equal) ^ ") \n" ^ (string_of_hint hint)
+ (* | Type (name, pattern) -> "type " ^ name ^ " = " ^ string_of_pattern_list pattern *)
+ | Definition (name, variables, output, varmatch, matchlist) -> "let rec " ^ name ^ " " ^ string_of_pattern_list variables ^ ": " ^ output ^ 
+ " = match " ^ varmatch ^ " with " ^ string_of_matches_list matchlist
+
 
  and string_of_expression (e : expression)
  =  match e with
@@ -47,10 +51,19 @@ and string_of_hint (h : hint option) : string =
   | Some Induction (var) -> "(*hint: induction " ^ var ^ " *)"
 
 and string_of_pattern_list (pl : pattern list) : string =
-  List.fold_left (fun i x -> i ^ string_of_pattern x ^ "\n|") "|" pl 
+  List.fold_left (fun i x -> i ^ string_of_pattern x ^ " ") " " pl 
 
 and string_of_pattern (p : pattern) : string =
   match p with
-  | Constructor (name, []) -> name
-  | Constructor (name, patterns) -> name ^ " (" ^ (String.concat ", " (List.map string_of_pattern patterns)) ^ ")"
-  | Variable (nm1, nm2) -> nm1 ^ ": " ^ nm2
+  | Constructor (name, []) -> "| " ^ name 
+  | Constructor (name, patterns) -> "| " ^ name ^ " (" ^ (String.concat ", " (List.map string_of_pattern patterns)) ^ ")"
+  | Variable (nm1, nm2) -> "(" ^ nm1 ^ " : " ^ nm2 ^ ")"
+  (* | Variable (nm1) -> nm1  *)
+
+and string_of_matches_list (ml : matches list) : string =
+  List.fold_left (fun i x -> i ^ string_of_matches x ^ "\n") " " ml 
+
+and string_of_matches (m : matches) : string =
+  match m with
+  | Case (pattern, expression) -> string_of_pattern pattern ^ " -> " ^ string_of_expression expression
+  (* | Variable (nm1) -> nm1  *)

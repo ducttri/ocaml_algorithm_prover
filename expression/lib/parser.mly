@@ -8,31 +8,42 @@
 %token COLON
 %token LET
 %token COMMA
+%token REC
 // %token TYPE
 // %token OF
 %token EOF
 %token PROVE
 %token AXIOM
 %token <string> INDUCTION
-// %token PATTERN
-// %token MATCH
+%token PATTERN
+%token PAIR
+%token ARROW
+%token WITH
+%token MATCH
 %start main
 %type <declaration list> main
 %type <declaration> declaration
 %type <expression> expression
-// %type <pattern> pattern
+%type <pattern> pattern
 %type <equal> equal
 %type <hint> hint
+%type <matches> matches
 %type <typeVar> typeVar
 %%
 main:
 | d = list(declaration) ; EOF { d }
 
 declaration:
-| LET ; PROVE ; nm = IDENT; var = list(typeVar); EQUALS; eq1 = equal; hint = option(hint)
+| LET ; PROVE ; nm = IDENT; var = list(pattern); EQUALS; eq1 = equal; hint = option(hint)
   { Proof (nm, var, eq1, hint) }
-// | LET ; TYPE ; nm = IDENT; pt = list(pattern)
+| LET ; REC ; name = IDENT ; variables = list(pattern) ; COLON ; output = IDENT ; EQUALS;
+    MATCH; varmatch = IDENT ; WITH ; matchlist = list(matches)
+    { Definition(name, variables, output, varmatch, matchlist) }
+// | TYPE ; nm = IDENT; EQUALS; pt = list(pattern)
 //   { Type (nm, pt) }
+
+matches:
+ | PATTERN ; p1 = pattern ; ARROW ; e1 = expression { Case (p1, e1) }
 
 hint:
 | AXIOM { Axiom }
@@ -41,10 +52,10 @@ hint:
 typeVar:
 | LPAREN ; nm1 = IDENT ; COLON ; nm2 = IDENT ; RPAREN  { Var (nm1, nm2) }
 
-// pattern:
-// | LPAREN ; nm1 = IDENT ; COLON ; nm2 = IDENT ; RPAREN  { Variable (nm1, nm2) }
-// | PATTERN; nm1 = IDENT { Constructor (nm1, []) }
-// | PATTERN; nm1 = IDENT ; OF ; LPAREN ; pt = list(IDENT) ; RPAREN
+pattern:
+| nm1 = IDENT { Constructor (nm1, []) }
+| LPAREN ; nm1 = IDENT ; COLON ; nm2 = IDENT ; RPAREN { Variable (nm1, nm2) }
+| nm1 = IDENT ; LPAREN ; args = separated_nonempty_list(COMMA, pattern) ; RPAREN { Constructor (nm1, args)}
 
 
 expression:
