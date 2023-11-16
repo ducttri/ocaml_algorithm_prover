@@ -9,12 +9,12 @@
 %token LET
 %token EOF
 %token PROVE
-%token <string> HINT
+%token AXIOM
 %start main
 %type <declaration list> main
 %type <declaration> declaration
 %type <expression> expression
-%type <pattern> pattern
+// %type <pattern> pattern
 %type <equal> equal
 %type <hint> hint
 %type <typeVar> typeVar
@@ -27,15 +27,15 @@ declaration:
   { Proof (nm, var, eq1, hint) }
 
 hint:
-| { Axiom }
+| AXIOM { Axiom }
 
 typeVar:
 | LPAREN ; nm1 = IDENT ; COLON ; nm2 = IDENT ; RPAREN  { Var (nm1, nm2) }
 
 
-pattern:
-| LPAREN ; nm1 = IDENT ; COLON ; nm2 = IDENT ; RPAREN  { Variable (nm1, nm2) }
-| nm1 = IDENT ; p1 = list(pattern) { Constructor (nm1, p1) }
+// pattern:
+// | LPAREN ; nm1 = IDENT ; COLON ; nm2 = IDENT ; RPAREN  { Variable (nm1, nm2) }
+// | nm1 = IDENT ; p1 = list(pattern) { Constructor (nm1, p1) }
 
 expression:
 | LPAREN ; e = expression ; RPAREN { e }

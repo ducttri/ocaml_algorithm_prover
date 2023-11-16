@@ -21,7 +21,7 @@ rule token = parse
  | eof { EOF }
 and hint = parse
  | [' ' '\t'] { hint lexbuf }
- | _+ as str { HINT(str) }
+ | "axiom *)" { AXIOM }
  | "*)" { token lexbuf }
 and comment level = parse
  | "*)" { if level = 0 then token lexbuf 
