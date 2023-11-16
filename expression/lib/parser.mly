@@ -30,7 +30,6 @@ declaration:
   { Proof (nm, var, eq1, hint) }
 // | LET ; TYPE ; pt = list(pattern)
 
-
 hint:
 | AXIOM { Axiom }
 

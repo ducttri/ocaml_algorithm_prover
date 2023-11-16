@@ -11,7 +11,8 @@ rule token = parse
  | "let" { LET }
  (* | "type" { TYPE } *)
  | "(*prove*)" { PROVE }
- | "(*hint: " { hint lexbuf }
+ (* | "(*hint: " { hint lexbuf } *)
+ | "(*hint: axiom *)" { AXIOM }
  | "(*" { comment 0 lexbuf }
  (* | "|" { PATTERN } *)
  (* | "->" { MATCH } *)
@@ -22,10 +23,10 @@ rule token = parse
  | ['a'-'z' 'A'-'Z' '0'-'9' '_' '\'']+ as word { IDENT(word) }
  | _ { raise (SyntaxError ("Unexpected char: " ^ Lexing.lexeme lexbuf)) }
  | eof { EOF }
-and hint = parse
+(* and hint = parse
  | [' ' '\t'] { hint lexbuf }
- | "axiom*)" { AXIOM }
- | "*)" { token lexbuf }
+ | "axiom *)" { AXIOM }
+ | "*)" { token lexbuf } *)
 and comment level = parse
  | "*)" { if level = 0 then token lexbuf 
           else comment (level - 1) lexbuf }
