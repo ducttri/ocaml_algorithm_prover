@@ -41,7 +41,7 @@ typeVar:
 // pattern:
 // | LPAREN ; nm1 = IDENT ; COLON ; nm2 = IDENT ; RPAREN  { Variable (nm1, nm2) }
 // | PATTERN; nm1 = IDENT { Constructor (nm1, []) }
-// | PATTERN; nm1 = IDENT ; OF ; LPAREN ; pt = list(IDENT) ; RPAREN 
+// | PATTERN; nm1 = IDENT ; OF ; LPAREN ; pt = list(IDENT) ; RPAREN
 
 
 expression:

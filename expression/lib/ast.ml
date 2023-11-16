@@ -7,7 +7,7 @@ type pattern =
   | Constructor of (string * pattern list)
   | Type of (string * string)
   (* constructor are like match .... with | a; | b *)
-  (* variable are inside when matching for ex Cons(h, append ...) *)
+  (* variable are inside when matching for ex Cons(h, append ...) *) 
 type typeVar =
   | Var of (string * string) 
   (* var name and type *)

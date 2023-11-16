@@ -26,7 +26,7 @@ and string_of_expression_with_parens (e : expression) : string
 
 and string_of_equal (e : equal) : string
 = match e with
- | Equality (e1, e2) -> string_of_expression e1 ^ " = " ^ string_of_expression e2
+ | Equality (e1, e2) -> string_of_expression e1 ^ " = " ^ string_of_expression e2 
 
 and parse (s : string) : declaration list =
   let lexbuf = Lexing.from_string s in

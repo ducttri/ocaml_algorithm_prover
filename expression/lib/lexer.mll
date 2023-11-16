@@ -3,7 +3,7 @@
  exception SyntaxError of string
 }
 
-let newline = '\r' | '\n' | "\r\n"
+let newline = '\r' | '\n' | "\r\n" 
 
 rule token = parse
  | [' ' '\t'] { token lexbuf }
