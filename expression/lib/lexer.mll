@@ -14,6 +14,7 @@ rule token = parse
  (* | "(*hint: " { hint lexbuf } *)
  | "(*hint: axiom *)" { AXIOM }
  | "(*" { comment 0 lexbuf }
+ (* | "of" { OF } *)
  (* | "|" { PATTERN } *)
  (* | "->" { MATCH } *)
  | ":" { COLON }
