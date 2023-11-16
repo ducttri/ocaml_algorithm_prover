@@ -3,7 +3,7 @@
  exception SyntaxError of string
 }
 
-let newline = '\r' | '\n' | "\r\n"
+let newline = '\r' | '\n' | "\r\n" 
 
 rule token = parse
  | [' ' '\t'] { token lexbuf }
@@ -14,6 +14,7 @@ rule token = parse
  (* | "(*hint: " { hint lexbuf } *)
  | "(*hint: axiom *)" { AXIOM }
  | "(*" { comment 0 lexbuf }
+ (* | "of" { OF } *)
  (* | "|" { PATTERN } *)
  (* | "->" { MATCH } *)
  | ":" { COLON }

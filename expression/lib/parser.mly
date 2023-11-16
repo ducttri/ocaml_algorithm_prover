@@ -8,6 +8,7 @@
 %token COLON
 %token LET
 // %token TYPE
+// %token OF
 %token EOF
 %token PROVE
 %token AXIOM
@@ -26,9 +27,10 @@ main:
 | d = declaration ; EOF { [d] }
 
 declaration:
-| LET ; PROVE ; nm = IDENT; var = list(typeVar); EQUALS; eq1 = equal; hint = hint
+| LET ; PROVE ; nm = IDENT; var = list(typeVar); EQUALS; eq1 = equal; hint = option(hint)
   { Proof (nm, var, eq1, hint) }
-// | LET ; TYPE ; pt = list(pattern)
+// | LET ; TYPE ; nm = IDENT; pt = list(pattern)
+//   { Type (nm, pt) }
 
 hint:
 | AXIOM { Axiom }
@@ -38,7 +40,9 @@ typeVar:
 
 // pattern:
 // | LPAREN ; nm1 = IDENT ; COLON ; nm2 = IDENT ; RPAREN  { Variable (nm1, nm2) }
-// | PATTERN; nm1 = IDENT ; 
+// | PATTERN; nm1 = IDENT { Constructor (nm1, []) }
+// | PATTERN; nm1 = IDENT ; OF ; LPAREN ; pt = list(IDENT) ; RPAREN
+
 
 expression:
 | LPAREN ; e = expression ; RPAREN { e }
