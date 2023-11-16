@@ -9,9 +9,12 @@ rule token = parse
  | [' ' '\t'] { token lexbuf }
  | newline { Lexing.new_line lexbuf; token lexbuf }
  | "let" { LET }
+ (* | "type" { TYPE } *)
  | "(*prove*)" { PROVE }
  | "(*hint: " { hint lexbuf }
  | "(*" { comment 0 lexbuf }
+ (* | "|" { PATTERN } *)
+ (* | "->" { MATCH } *)
  | ":" { COLON }
  | "(" { LPAREN }
  | ")" { RPAREN }
@@ -21,7 +24,7 @@ rule token = parse
  | eof { EOF }
 and hint = parse
  | [' ' '\t'] { hint lexbuf }
- | _+ as str { HINT(str) }
+ | "axiom*)" { AXIOM }
  | "*)" { token lexbuf }
 and comment level = parse
  | "*)" { if level = 0 then token lexbuf 
