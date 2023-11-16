@@ -15,11 +15,12 @@ type typeVar =
 type equal = 
   | Equality of expression * expression
 
-type hint = 
+type hint =
   | Axiom 
   (* | Induction of string *)
 
 type declaration = 
-  | Proof of (string * typeVar * equal * hint)
+  | Proof of (string * typeVar list * equal * hint)
+  (* | Type of (string * pattern list) *)
 
   (* Proof of (string * typeVar list * pattern list * equal * hint option) *)
