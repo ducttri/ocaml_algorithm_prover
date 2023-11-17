@@ -5,7 +5,7 @@ module Lexer = Lexer
 let rec string_of_declaration (d : declaration) : string
  = match d with
  | Proof (name, variables, equal, hint) -> "let (*prove*) " ^ name ^ "" ^ string_of_pattern_list variables ^ " = (" ^ (string_of_equal equal) ^ ") \n" ^ (string_of_hint hint)
- (* | Type (name, pattern) -> "type " ^ name ^ " = " ^ string_of_pattern_list pattern *)
+ | Type (name, pattern) -> "type " ^ name ^ " = " ^ string_of_type_list pattern
  | Definition (name, variables, output, varmatch, matchlist) -> "let rec " ^ name ^ " " ^ string_of_pattern_list variables ^ ": " ^ output ^ 
  " = match " ^ varmatch ^ " with " ^ string_of_matches_list matchlist
 
@@ -37,13 +37,6 @@ and parse (s : string) : declaration list =
   let ast = Parser.main Lexer.token lexbuf in
   ast
 
-and string_of_variable_list (vl : typeVar list) : string =
-  List.fold_left (fun i x -> i ^ string_of_variable x ^ " ") "" vl 
-
-and string_of_variable (var : typeVar) : string =
-  match var with
-  | Var (name, vartype) -> " (" ^ name ^ " : " ^ vartype ^ ")"
-
 and string_of_hint (h : hint option) : string =
   match h with
   | None -> " "
@@ -57,8 +50,7 @@ and string_of_pattern (p : pattern) : string =
   match p with
   | Constructor (name, []) -> "| " ^ name 
   | Constructor (name, patterns) -> "| " ^ name ^ " (" ^ (String.concat ", " (List.map string_of_pattern patterns)) ^ ")"
-  | Variable (nm1, nm2) -> "(" ^ nm1 ^ " : " ^ nm2 ^ ")"
-  (* | Variable (nm1) -> nm1  *)
+  | Variable (nm1, nm2) -> "(" ^ nm1 ^ " : " ^ nm2 ^ ")" 
 
 and string_of_matches_list (ml : matches list) : string =
   List.fold_left (fun i x -> i ^ string_of_matches x ^ "\n") " " ml 
@@ -66,4 +58,12 @@ and string_of_matches_list (ml : matches list) : string =
 and string_of_matches (m : matches) : string =
   match m with
   | Case (pattern, expression) -> string_of_pattern pattern ^ " -> " ^ string_of_expression expression
-  (* | Variable (nm1) -> nm1  *)
+
+and string_of_type_list (pl : pattern list) : string =
+  List.fold_left (fun i x -> i ^ string_of_type x ^ " ") " " pl 
+
+and string_of_type (p : pattern) : string =
+  match p with
+  | Constructor (name, []) -> "| " ^ name 
+  | Constructor (name, patterns) -> "| " ^ name ^ " of (" ^ (String.concat " * " (List.map string_of_type patterns)) ^ ")"
+  | Variable (nm1, _) -> nm1

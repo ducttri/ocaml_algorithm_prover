@@ -8,10 +8,6 @@ type pattern =
   (* constructor are like match .... with | a; | b *)
   (* variable are inside when matching for ex Cons(h, append ...) *) 
 
-type typeVar =
-  | Var of (string * string) 
-  (* var name and type *)
-
 type equal = 
   | Equality of expression * expression
 
@@ -24,7 +20,7 @@ type matches =
 
 type declaration = 
   | Proof of (string * pattern list * equal * hint option)
-  (* | Type of (string * variant list) *)
+  | Type of (string * pattern list)
   | Definition of (string * pattern list * string * string * matches list )
 
   (* Proof of (string * typeVar list * pattern list * equal * hint option) *)

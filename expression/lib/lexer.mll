@@ -9,7 +9,7 @@ rule token = parse
  | [' ' '\t'] { token lexbuf }
  | newline { Lexing.new_line lexbuf; token lexbuf }
  | "let" { LET }
- (* | "type" { TYPE } *)
+ | "type" { TYPE }
  | "rec" { REC }
  | "with" { WITH }
  | "match" { MATCH }
@@ -17,7 +17,7 @@ rule token = parse
  | "(*hint: axiom *)" { AXIOM }
  | "(*hint: induction" { induction lexbuf}
  | "(*" { comment 0 lexbuf }
- (* | "of" { OF } *)
+ | "of" { OF }
  | "|" { PATTERN }
  | "*" { PAIR }
  | "->" { ARROW }

@@ -9,8 +9,8 @@
 %token LET
 %token COMMA
 %token REC
-// %token TYPE
-// %token OF
+%token TYPE
+%token OF
 %token EOF
 %token PROVE
 %token AXIOM
@@ -28,7 +28,6 @@
 %type <equal> equal
 %type <hint> hint
 %type <matches> matches
-%type <typeVar> typeVar
 %%
 main:
 | d = list(declaration) ; EOF { d }
@@ -39,8 +38,8 @@ declaration:
 | LET ; REC ; name = IDENT ; variables = list(pattern) ; COLON ; output = IDENT ; EQUALS;
     MATCH; varmatch = IDENT ; WITH ; matchlist = list(matches)
     { Definition(name, variables, output, varmatch, matchlist) }
-// | TYPE ; nm = IDENT; EQUALS; pt = list(pattern)
-//   { Type (nm, pt) }
+| TYPE ; nm = IDENT; EQUALS; PATTERN ; pt = separated_nonempty_list(PATTERN, pattern)
+  { Type (nm, pt) }
 
 matches:
  | PATTERN ; p1 = pattern ; ARROW ; e1 = expression { Case (p1, e1) }
@@ -49,13 +48,11 @@ hint:
 | AXIOM { Axiom }
 | id = INDUCTION { Induction(id) }
 
-typeVar:
-| LPAREN ; nm1 = IDENT ; COLON ; nm2 = IDENT ; RPAREN  { Var (nm1, nm2) }
-
 pattern:
-| nm1 = IDENT { Constructor (nm1, []) }
+| nm1 = IDENT { Variable (nm1, nm1) }
 | LPAREN ; nm1 = IDENT ; COLON ; nm2 = IDENT ; RPAREN { Variable (nm1, nm2) }
 | nm1 = IDENT ; LPAREN ; args = separated_nonempty_list(COMMA, pattern) ; RPAREN { Constructor (nm1, args)}
+| nm1 = IDENT ; OF ; LPAREN ; args = separated_nonempty_list(PAIR, pattern) ; RPAREN { Constructor (nm1, args)}
 
 
 expression:
