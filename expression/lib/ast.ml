@@ -21,6 +21,5 @@ type matches =
 type declaration = 
   | Proof of (string * pattern list * equal * hint option)
   | Type of (string * pattern list)
-  | Definition of (string * pattern list * string * string * matches list )
-
-  (* Proof of (string * typeVar list * pattern list * equal * hint option) *)
+  | Definition of (string * pattern list * string * string * matches list)
+  

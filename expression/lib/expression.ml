@@ -16,18 +16,6 @@ let rec string_of_declaration (d : declaration) : string
  | Application (e1, []) -> " " ^ (string_of_expression e1)
  | Application (e1, expressions) -> (string_of_expression e1) ^ " (" ^ (String.concat ", " (List.map string_of_expression expressions)) ^ ")"
 
-(* and string_of_expression (e : expression)
- =  match e with
- | Identifier nm -> nm
- | Application (e1, e2) ->
-  (string_of_expression e1) ^ 
-  " " ^ (string_of_expression_with_parens e2) *)
-
-(* and string_of_expression_with_parens (e : expression) : string
- = match e with 
- | Identifier nm -> nm
- | Application _ -> "(" ^ string_of_expression e ^ ")" *)
-
 and string_of_equal (e : equal) : string
 = match e with
  | Equality (e1, e2) -> string_of_expression e1 ^ " = " ^ string_of_expression e2 
@@ -67,3 +55,26 @@ and string_of_type (p : pattern) : string =
   | Constructor (name, []) -> "| " ^ name 
   | Constructor (name, patterns) -> "| " ^ name ^ " of (" ^ (String.concat " * " (List.map string_of_type patterns)) ^ ")"
   | Variable (nm1, _) -> nm1
+    
+
+
+(*MATCHING*)
+(* singleton, empty, find, merge (funciton), subtitute (function) *)
+
+module Substitution = struct
+  module MM = Map.Make(String)
+  type t = expression MM.t  
+  let empty = MM.empty
+  let singleton = MM.singleton
+  let merge mp1 mp2 = Some (MM.merge (fun k l r -> if l == None then r else l) mp1 mp2)
+end
+
+let rec match_expression (var : string list) (pattern : expression) (goal : expression) : Substitution.t option =
+ match pattern with
+ | Identifier nm -> if List.mem nm var then Some Substitution.singleton nm goal else 
+                    (if goal = Identifier nm then Some Substitution.empty else None)
+ | Application (e1, []) -> 
+ | Application (e1, e2::etl) -> match expression with
+                                | Application 
+                                | _ -> None
+ | _ -> None
