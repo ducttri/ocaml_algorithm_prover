@@ -5,9 +5,7 @@ type expression =
 type pattern =
   | Constructor of (string * pattern list)
   | Variable of string * string
-  (* constructor are like match .... with | a; | b *)
-  (* variable are inside when matching for ex Cons(h, append ...) *) 
-
+  
 type equal = 
   | Equality of expression * expression
 

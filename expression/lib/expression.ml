@@ -25,6 +25,13 @@ and parse (s : string) : declaration list =
   let ast = Parser.main Lexer.token lexbuf in
   ast
 
+(* parse expression tester *)
+(* instead of writing a whole proof we can use paste an expression to test *)
+(* and parse_expression (s : string) : expression =
+  let lexbuf = Lexing.from_string s in
+  let ast = Parser.expression_eof Lexer.token lexbuf in ast  *)
+(* uncomment this might be better *)
+
 and string_of_hint (h : hint option) : string =
   match h with
   | None -> " "
@@ -60,21 +67,33 @@ and string_of_type (p : pattern) : string =
 
 (*MATCHING*)
 (* singleton, empty, find, merge (funciton), subtitute (function) *)
+(* print_subt can be delete *)
+(* let Some result = match_expression ... *)
+(* Subtution.print_subt result *)
+
+(* for merge, we can try to use iter + mem to check whether they are in the Map *)
+(* double check lecture 29 for more information on case testing *)
+
 
 module Substitution = struct
   module MM = Map.Make(String)
   type t = expression MM.t  
   let empty = MM.empty
   let singleton = MM.singleton
-  let merge mp1 mp2 = Some (MM.merge (fun k l r -> if l == None then r else l) mp1 mp2)
+  let merge mp1 mp2 = Some (MM.merge (fun k l r -> if (MM.find_opt k mp1) == None then r else l) mp1 mp2)
+  let print_subt (s : t) =
+    MM.iter (fun k v -> print_endline (k ^ " -> " ^ string_of_expression v)) s
 end
+
+(* match case watchout for unequal !!! *)
 
 let rec match_expression (var : string list) (pattern : expression) (goal : expression) : Substitution.t option =
  match pattern with
- | Identifier nm -> if List.mem nm var then Some Substitution.singleton nm goal else 
+ | Identifier nm -> if List.mem nm var then (Some (Substitution.singleton nm goal)) else 
                     (if goal = Identifier nm then Some Substitution.empty else None)
- | Application (e1, []) -> 
- | Application (e1, e2::etl) -> match expression with
-                                | Application 
+ | Application (e1, []) -> None
+ | Application (Identifier nm, e::etl) -> match goal with
+                                | Application (Identifier nm2, e22::etl2) -> if nm = nm2 then else 
                                 | _ -> None
  | _ -> None
+and match_expression_list ()

@@ -22,6 +22,10 @@
 %token MATCH
 %start main
 %type <declaration list> main
+
+// %start expression_eof
+// %type <expression> expression_eof
+
 %type <declaration> declaration
 %type <expression> expression
 %type <pattern> pattern
@@ -29,6 +33,13 @@
 %type <hint> hint
 %type <matches> matches
 %%
+
+
+
+
+// expression_eof:
+// | e = expression ; EOF { e }
+
 main:
 | d = list(declaration) ; EOF { d }
 

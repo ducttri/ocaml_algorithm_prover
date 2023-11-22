@@ -1,1 +1,25 @@
-foo x y
+let rec append (l1 : list) (l2 : list) : list =
+  match l1 with
+  | Nil -> l2
+  | Cons ((h : int), (t : list)) -> Cons (h, append t l2)
+          name type  name type
+
+type list =  
+  | Nil
+  | Cons of (int * list)
+            type   type
+
+type typeVar =
+  | Var of (string * string) 
+
+type pattern = 
+ | Constructor of (string * typeVar list)
+ | Variable of (string * string)
+
+type match = Case of (pattern, expression)
+
+match:
+ | pattern ; ARROW ; expression { Case of (pattern, expression) }
+
+LET ; REC ; name = IDENT ; variable = list(typeVar) ; COLON ; out = IDENT ; EQUALS;
+    MATCH; varmatch = IDENT ; WITH ; matchlist = list(match)

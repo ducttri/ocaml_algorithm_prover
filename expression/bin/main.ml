@@ -92,7 +92,9 @@
       Note that "Arg.String" takes a function of type: string -> unit.
       This is where we plug in the 'printfile' function we wrote above. *)
    let speclist =
-     [("--printback", Arg.String printfile, "Print the parsed file back out")]
+     [("--printback", Arg.String printfile, "Print the parsed file back out")
+     (* ,("--simple", Arg.String ) *)
+     ]
    
    let _ = Arg.parse
               speclist
