@@ -83,11 +83,10 @@ module Substitution = struct
   let find = MM.find
   let merge mp1 mp2 = 
     match (mp1, mp2) with
-    | (None, Some map2) -> Some (map2)
-    | (Some map1, None) -> Some (map1)
+    | (None, _) -> None
+    | (_, None) -> None
     | (Some map1, Some map2) -> Some (MM.merge (fun k l r -> 
       if (MM.find_opt k map1) == None then r else (if (MM.find_opt k map2) == None then l else None)) map1 map2)
-    | (None, None) -> None
   let print_subt (s : t option) =
     match s with
     | None -> print_endline ("end")
@@ -108,13 +107,13 @@ let rec match_expression (var : string list) (pattern : expression) (goal : expr
 
 and match_expression_list (var : string list) (pattern : expression list) (goal : expression list) : Substitution.t option =
   match pattern with
-  | [] -> None
+  | [] -> Some Substitution.empty
   | (h::tl) -> match goal with
             | (h2::tl2) -> (Substitution.merge (match_expression var h h2) (match_expression_list var tl tl2))
-            | [] -> None
+            | [] -> Some Substitution.empty
 
-let attemptRewrite (var : string list) (eq : equal) (expr : expression) : expression option =
+(* let attemptRewrite (var : string list) (eq : equal) (expr : expression) : expression option =
   match eq with
   | Equality (lhs, rhs) -> match match_expression var lhs expr with
                            | 
-                           | None -> 
+                           | None ->  *)
