@@ -1,25 +1,46 @@
-let rec append (l1 : list) (l2 : list) : list =
-  match l1 with
-  | Nil -> l2
-  | Cons ((h : int), (t : list)) -> Cons (h, append t l2)
-          name type  name type
 
-type list =  
-  | Nil
-  | Cons of (int * list)
-            type   type
+Expression.Substitution.print_subt (Expression.match_expression ["x"; "y"] (Expression.parse_expression "foo x y") (Expression.parse_expression "no (bar z) (bar z)"))
 
-type typeVar =
-  | Var of (string * string) 
+Expression.Substitution.print_subt (Expression.match_expression ["x"; "y"] (Expression.parse_expression "foo x y") (Expression.parse_expression "foo a b"))
 
-type pattern = 
- | Constructor of (string * typeVar list)
- | Variable of (string * string)
+Expression.Substitution.print_subt (Expression.match_expression ["x"; "y"] (Expression.parse_expression "foo x x") (Expression.parse_expression "foo (bar z) (bar z)"))
 
-type match = Case of (pattern, expression)
+Expression.Substitution.print_subt (Expression.match_expression ["x"; "y"] (Expression.parse_expression "foo x (foo y)") (Expression.parse_expression "foo (bar z) y"))
 
-match:
- | pattern ; ARROW ; expression { Case of (pattern, expression) }
+Expression.attemptRewrite ["x"; "y"] (Expression.Equality (Expression.parse_expression "foo x y", Expression.parse_expression "x y")) (Expression.parse_expression "foo (bar z) (bar w)")
 
-LET ; REC ; name = IDENT ; variable = list(typeVar) ; COLON ; out = IDENT ; EQUALS;
-    MATCH; varmatch = IDENT ; WITH ; matchlist = list(match)
+Expression.Substitution.print_subt (Expression.match_expression ["y"] (Expression.parse_expression "foo x y") (Expression.parse_expression "foo a b"))
+
+Expression.attemptRewrite ["y"] (Expression.Equality (Expression.parse_expression "foo x y", Expression.parse_expression "y")) (Expression.parse_expression "foo a b")
+	
+let myEqualities =
+[ ("eq1", ["x"], Expression.Equality(Expression.parse_expression "foo x x", Expression.parse_expression "bar x"))
+; ("eq2", ["x";"y"], Expression.Equality(Expression.parse_expression "bar x y", Expression.parse_expression "y"))
+; ("eq3", ["x"], Expression.Equality(Expression.parse_expression "bozo x (foo x)", Expression.parse_expression "foo (bar x x)"))] ;; 
+
+Expression.attemptRewrite ["x"; "y"] (Expression.Equality (Expression.parse_expression "bar x y", Expression.parse_expression "y")) (Expression.parse_expression "foo (bar a b) c")
+Expression.Substitution.print_subt (Expression.match_expression ["x"; "y"] (Expression.parse_expression "bar x y") (Expression.parse_expression "foo (bar a b) c"))
+
+
+
+Expression.attemptRewrite ["y"] (Expression.Equality (Expression.parse_expression "bar x y", Expression.parse_expression "y")) (Expression.parse_expression "bar a b")
+
+Expression.Substitution.print_subt (Expression.match_expression ["y"] (Expression.parse_expression "bar y y") (Expression.parse_expression "bar a b"))
+Expression.attemptRewrite ["y"] (Expression.Equality (Expression.parse_expression "bar y y", Expression.parse_expression "y")) (Expression.parse_expression "bar a b")
+
+
+
+Expression.attemptRewrite ["x"] (Expression.Equality(Expression.parse_expression "foo x x", Expression.parse_expression "bar x")) (Expression.parse_expression "c");;
+
+
+Expression.tryEqualities (Expression.parse_expression "foo x x") myEqualities;;
+
+Expression.attemptRewrite ["x"] (Expression.Equality(Expression.parse_expression "foo x x", Expression.parse_expression "bar x")) (Expression.parse_expression "foo x x");;
+
+Expression.tryEqualities (Expression.parse_expression "foo (bar a b) c") myEqualities;;
+
+Expression.attemptRewrite ["x"] (Expression.Equality (Expression.parse_expression "foo x x", Expression.parse_expression "bar x")) (Expression.parse_expression "foo (bar a b) c")
+
+	
+	
+		
