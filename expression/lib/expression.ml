@@ -81,12 +81,13 @@ module Substitution = struct
   let empty = MM.empty
   let singleton = MM.singleton
   let find = MM.find
+  let mem = MM.mem
   let merge mp1 mp2 = 
     match (mp1, mp2) with
     | (None, _) -> None
     | (_, None) -> None
     | (Some map1, Some map2) -> Some (MM.merge (fun k l r -> 
-      if (MM.find_opt k map1) == None then r else (if (MM.find_opt k map2) == None then l else None)) map1 map2)
+      if (MM.find_opt k map1) == None then (if (MM.find_opt k map2) == None then None else r) else (if (MM.find_opt k map2) == None then l else (if find k map1 = find k map2 then l else None ))) map1 map2)
   let print_subt (s : t option) =
     match s with
     | None -> print_endline ("end")
@@ -95,15 +96,39 @@ end
 
 (* match case watchout for unequal !!! *)
 
-let rec match_expression (var : string list) (pattern : expression) (goal : expression) : Substitution.t option =
+(* let rec match_expression (var : string list) (pattern : expression) (goal : expression) : Substitution.t option =
  match pattern with
  | Identifier nm -> if List.mem nm var then (Some (Substitution.singleton nm goal)) else 
-                    (if goal = Identifier nm then Some Substitution.empty else None)
+                    (if goal = Identifier nm then Some Substitution.empty else Some Substitution.empty)
  | Application (_, []) -> None
  | Application (e1, etl) -> match goal with
           | Identifier _ -> None
           | Application (_, []) -> None
-          | Application (e2, etl2) -> (Substitution.merge (match_expression var e1 e2) (match_expression_list var etl etl2))
+          | Application (e2, etl2) -> (Substitution.merge (match_expression var e1 e2) (match_expression_list var etl etl2)) *)
+
+
+let rec match_expression (var : string list) (pattern : expression) (goal : expression) : Substitution.t option =
+  match pattern with
+  | Identifier nm -> (match goal with 
+                    | Identifier nm2 -> if ((List.mem nm var) || (nm = nm2)) then 
+                      (if List.mem nm var then (Some (Substitution.singleton nm goal)) else 
+                      (if goal = Identifier nm then Some Substitution.empty else Some Substitution.empty))
+                      else None
+                    | Application (_,_) -> if List.mem nm var then (Some (Substitution.singleton nm goal)) else 
+                      (if goal = Identifier nm then Some Substitution.empty else Some Substitution.empty))
+  | Application (_, []) -> None
+  | Application (e1, etl) -> match goal with
+            | Identifier _ -> None
+            | Application (_, []) -> None
+            | Application (e2, etl2) -> (Substitution.merge (match_expression var e1 e2) (match_expression_list var etl etl2))
+
+
+and match_expression_helper (var : string list) (pattern : expression) (goal : expression) : Substitution.t option =
+  match match_expression var pattern goal with
+  | None -> match goal with
+            | Application (e, eh::_) -> if (match_expression_helper var pattern e) = None then (match_expression_helper var pattern eh) else (match_expression_helper var pattern e)
+            | Identifier _ -> None
+  | Some 
 
 and match_expression_list (var : string list) (pattern : expression list) (goal : expression list) : Substitution.t option =
   match pattern with
@@ -112,8 +137,46 @@ and match_expression_list (var : string list) (pattern : expression list) (goal 
             | (h2::tl2) -> (Substitution.merge (match_expression var h h2) (match_expression_list var tl tl2))
             | [] -> Some Substitution.empty
 
-(* let attemptRewrite (var : string list) (eq : equal) (expr : expression) : expression option =
+
+
+let rec attemptRewrite (var : string list) (eq : equal) (expr : expression) : expression option =
   match eq with
   | Equality (lhs, rhs) -> match match_expression var lhs expr with
-                           | 
-                           | None ->  *)
+              | Some map -> if List.for_all (fun k -> Substitution.mem k map) var then Some (rewriterMap var rhs map) else None
+                            | None -> None
+                              (* match expr with
+                                    | Application (e1, h::tl) -> (match attemptRewrite var eq h  with
+                                                                | Some v -> Some (Application (e1, v::tl)) 
+                                                                (* Questionable code might need to look at? *)
+                                                                | _ -> None)
+                                    | Application (_, []) -> None
+                                    | Identifier _ -> None *)
+
+and rewriterMap (var : string list) (expr : expression) (map : Substitution.t) : expression =
+  match expr with
+  | Identifier nm -> if Substitution.mem nm map then Substitution.find nm map else Identifier nm
+  | Application (e, []) -> rewriterMap var e map
+  | Application (e, expressions) -> Application (rewriterMap var e map, List.map (fun ex1 -> rewriterMap var ex1 map) expressions)
+
+let rec tryEqualities (expr : expression) (eql : (string * string list * equal) list) : (string * expression) option =
+  match eql with
+  | [] -> None
+  | ((name, var, eq)::tl) -> match attemptRewrite var eq expr with
+                             | None -> tryEqualities expr tl 
+                             | Some expression -> Some (name, expression)
+
+let rec performSteps (expr : expression) (eql : (string * string list * equal) list) : (string * expression) list =
+  match tryEqualities expr eql with
+  | None -> []
+  | Some (nm, expre) -> (nm, expre) :: performSteps expre eql 
+
+
+let rec stepToString (lst : (string * expression) list) : string list =
+  match lst with
+  | [] -> []
+  | ((nm, expr) :: tl) -> ("{ " ^ nm ^ " }") :: (string_of_expression expr) :: (stepToString tl)
+
+
+let produceProof (eq : equal) (eql : (string * string list * equal) list) : string list =
+  match eq with
+  | Equality(lhs,rhs) -> stepToString (performSteps lhs eql) @ stepToString(performSteps rhs eql) 
