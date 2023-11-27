@@ -106,8 +106,16 @@ end
           | Application (_, []) -> None
           | Application (e2, etl2) -> (Substitution.merge (match_expression var e1 e2) (match_expression_list var etl etl2)) *)
 
-
-let rec match_expression (var : string list) (pattern : expression) (goal : expression) : Substitution.t option =
+let rec match_expression_helper (var : string list) (pattern : expression) (goal : expression) : Substitution.t option =
+  match match_expression var pattern goal with
+  | Some a -> Some a
+  | None -> (match goal with
+            | Application(Identifier _, b::_) -> match_expression_helper var pattern b
+            | Application(Application(a,_), _) -> match_expression_helper var pattern a
+            | Application(_, []) -> None
+            | Identifier _ -> None)
+            
+and match_expression (var : string list) (pattern : expression) (goal : expression) : Substitution.t option =
   match pattern with
   | Identifier nm -> (match goal with 
                     | Identifier nm2 -> if ((List.mem nm var) || (nm = nm2)) then 
@@ -122,14 +130,6 @@ let rec match_expression (var : string list) (pattern : expression) (goal : expr
             | Application (_, []) -> None
             | Application (e2, etl2) -> (Substitution.merge (match_expression var e1 e2) (match_expression_list var etl etl2))
 
-
-and match_expression_helper (var : string list) (pattern : expression) (goal : expression) : Substitution.t option =
-  match match_expression var pattern goal with
-  | None -> match goal with
-            | Application (e, eh::_) -> if (match_expression_helper var pattern e) = None then (match_expression_helper var pattern eh) else (match_expression_helper var pattern e)
-            | Identifier _ -> None
-  | Some 
-
 and match_expression_list (var : string list) (pattern : expression list) (goal : expression list) : Substitution.t option =
   match pattern with
   | [] -> Some Substitution.empty
@@ -141,7 +141,7 @@ and match_expression_list (var : string list) (pattern : expression list) (goal 
 
 let rec attemptRewrite (var : string list) (eq : equal) (expr : expression) : expression option =
   match eq with
-  | Equality (lhs, rhs) -> match match_expression var lhs expr with
+  | Equality (lhs, rhs) -> match match_expression_helper var lhs expr with
               | Some map -> if List.for_all (fun k -> Substitution.mem k map) var then Some (rewriterMap var rhs map) else None
                             | None -> None
                               (* match expr with

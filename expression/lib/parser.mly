@@ -20,8 +20,8 @@
 %token ARROW
 %token WITH
 %token MATCH
-// %start main
-// %type <declaration list> main
+%start main
+%type <declaration list> main
 
 %start expression_eof
 %type <expression> expression_eof
@@ -40,8 +40,8 @@
 expression_eof:
 | e = expression ; EOF { e }
 
-// main:
-// | d = list(declaration) ; EOF { d }
+main:
+| d = list(declaration) ; EOF { d }
 
 declaration:
 | LET ; PROVE ; nm = IDENT; var = list(pattern); EQUALS; eq1 = equal; hint = option(hint)
