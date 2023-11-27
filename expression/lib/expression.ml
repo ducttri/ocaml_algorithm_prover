@@ -111,7 +111,7 @@ let rec match_expression_helper (var : string list) (pattern : expression) (goal
   | Some a -> Some a
   | None -> (match goal with
             | Application(Identifier _, b::_) -> match_expression_helper var pattern b
-            | Application(Application(a,_), _) -> match_expression_helper var pattern a
+            | Application(Application(a,b), _) -> match_expression_helper var pattern (Application(a,b))
             | Application(_, []) -> None
             | Identifier _ -> None)
             
@@ -141,16 +141,17 @@ and match_expression_list (var : string list) (pattern : expression list) (goal 
 
 let rec attemptRewrite (var : string list) (eq : equal) (expr : expression) : expression option =
   match eq with
-  | Equality (lhs, rhs) -> match match_expression_helper var lhs expr with
+  | Equality (lhs, rhs) -> match match_expression var lhs expr with
               | Some map -> if List.for_all (fun k -> Substitution.mem k map) var then Some (rewriterMap var rhs map) else None
-                            | None -> None
-                              (* match expr with
-                                    | Application (e1, h::tl) -> (match attemptRewrite var eq h  with
-                                                                | Some v -> Some (Application (e1, v::tl)) 
-                                                                (* Questionable code might need to look at? *)
-                                                                | _ -> None)
-                                    | Application (_, []) -> None
-                                    | Identifier _ -> None *)
+              | None -> (match expr with
+                        | Application(Identifier x, b::tl) -> (match attemptRewrite var eq b with
+                                                              | Some v -> Some (Application (Identifier x, v::tl))
+                                                              | None -> None)
+                        | Application(Application(a,b), tl) -> (match attemptRewrite var eq (Application(a,b)) with
+                                                              | Some v -> Some (Application (v, tl))
+                                                              | None -> None)
+                        | Application(_, []) -> None
+                        | Identifier _ -> None)
 
 and rewriterMap (var : string list) (expr : expression) (map : Substitution.t) : expression =
   match expr with
