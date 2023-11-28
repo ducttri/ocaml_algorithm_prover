@@ -22,6 +22,10 @@
 %token MATCH
 %start main
 %type <declaration list> main
+
+%start expression_eof
+%type <expression> expression_eof
+
 %type <declaration> declaration
 %type <expression> expression
 %type <pattern> pattern
@@ -29,6 +33,13 @@
 %type <hint> hint
 %type <matches> matches
 %%
+
+
+
+
+expression_eof:
+| e = expression ; EOF { e }
+
 main:
 | d = list(declaration) ; EOF { d }
 
@@ -49,7 +60,7 @@ hint:
 | id = INDUCTION { Induction(id) }
 
 pattern:
-| nm1 = IDENT { Variable (nm1, nm1) }
+| nm1 = IDENT { Constructor (nm1, []) }
 | LPAREN ; nm1 = IDENT ; COLON ; nm2 = IDENT ; RPAREN { Variable (nm1, nm2) }
 | nm1 = IDENT ; LPAREN ; args = separated_nonempty_list(COMMA, pattern) ; RPAREN { Constructor (nm1, args)}
 | nm1 = IDENT ; OF ; LPAREN ; args = separated_nonempty_list(PAIR, pattern) ; RPAREN { Constructor (nm1, args)}
