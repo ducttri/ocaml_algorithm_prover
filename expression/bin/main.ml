@@ -93,7 +93,7 @@
       This is where we plug in the 'printfile' function we wrote above. *)
    let speclist =
      [("--printback", Arg.String printfile, "Print the parsed file back out")
-     (* ,("--simple", Arg.String ) *)
+     ,("--simple", Arg.String )
      ]
    
    let _ = Arg.parse

@@ -1,1 +1,21 @@
-foo x (bar x y) (bar2 x y)
+Expression.Application
+ (Expression.Application
+   (Expression.Application
+     (Expression.Identifier "bozo", [Expression.Identifier "a"]),
+    [Expression.Application
+      (Expression.Application
+        (Expression.Identifier "bar",
+         [Expression.Application
+           (Expression.Identifier "foo", [Expression.Identifier "b"])]),
+       [Expression.Application
+         (Expression.Identifier "foo", [Expression.Identifier "a"])])]),
+  [Expression.Identifier "a"])
+
+ Expression.expression = (Expression.Application (Expression.Identifier "bar", [Expression.Application (Expression.Identifier "foo", [Expression.Identifier "b"])]), [Expression.Application (Expression.Identifier "foo", [Expression.Identifier "a"])])
+
+
+Expression.produceProof (Expression.Equality (Expression.parse_expression "bozo a (bar (foo b) (foo a)) a"), Expression.parse_expression "bar a") myEqualities;;
+
+Expression.produceProof (Expression.Equality ((Expression.parse_expression "bozo a (bar (foo b) (foo a)) a"), (Expression.parse_expression "bar a"))) myEqualities;;
+
+
