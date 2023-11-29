@@ -3,6 +3,7 @@
    Names may vary, but these are the things this executable needs.
    In any case, these four definitions should be the only things you need to change. *)
    let string_of_declaration = Expression.string_of_declaration
+   let produce_output_simple = Expression.produce_output_simple
    let mainParser = Expression.Parser.main
    let mainLexer = Expression.Lexer.token
    module Parser : (sig exception Error end) = Expression.Parser
@@ -55,6 +56,17 @@
                        string_of_int pos.pos_lnum^", character "^
                        string_of_int (pos.pos_cnum - pos.pos_bol)^
                        ":\n  Syntax error")
+
+   let prove_basic (filename : string) (chan : in_channel)
+   = let buf = Lexing.from_channel ~with_positions:true chan in
+   match mainParser mainLexer buf with
+   | ast -> let _ = produce_output_simple ast in ()
+   | exception Parser.Error ->
+      let pos = buf.lex_start_p in
+      print_endline ("File \""^filename^"\", line "^
+                     string_of_int pos.pos_lnum^", character "^
+                     string_of_int (pos.pos_cnum - pos.pos_bol)^
+                     ":\n  Syntax error")
    
    (* This function is borrowed largely from Janestreet's core library *)
    (* It is used to ensure that files get closed after they are opened *)
@@ -77,6 +89,11 @@
     = protectx (printback_file filename)
                (Stdlib.open_in_gen [ Open_rdonly ] 0o000 filename)
                Stdlib.close_in
+
+   let provefile (filename : string) : unit
+   = protectx (prove_basic filename)
+               (Stdlib.open_in_gen [ Open_rdonly ] 0o000 filename)
+               Stdlib.close_in
    
    (***********************************************************)
    (* here's the code for dealing with command line arguments *)
@@ -92,8 +109,8 @@
       Note that "Arg.String" takes a function of type: string -> unit.
       This is where we plug in the 'printfile' function we wrote above. *)
    let speclist =
-     [("--printback", Arg.String printfile, "Print the parsed file back out")
-     ,("--simple", Arg.String )
+     [("--printback", Arg.String printfile, "Print the parsed file back out");
+     ("--simple", Arg.String provefile, "Parse the file, but don't print anything")
      ]
    
    let _ = Arg.parse

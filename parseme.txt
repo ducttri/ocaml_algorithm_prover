@@ -1,4 +1,4 @@
-let decls = Expression.parse "(* A minimal sample file for your ocaml prover.
+(* A minimal sample file for your ocaml prover.
    This file does not contain everything your prover needs to do, just a small selection:
    - all functions and lemmas have only a single argument
    - the only statement is a let-prove statement
@@ -15,7 +15,7 @@ let (*prove*) inv_involution (h : int)
 
 let (*prove*) cf_inv_commute (h : int)
  = (cf (inv h) = inv (cf h))
-(*hint: axiom *)
+(*hint: axiom *)     
 
 (* This should now be provable from the axioms: *)
 let (*prove*) cf_inv_property (h : int)
@@ -33,4 +33,4 @@ let (*prove*) cf_inv_property (h : int)
    inv (inv (cf h))
   = {lemma inv_involution}
    cf h
-*)";;
+*)
